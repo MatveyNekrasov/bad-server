@@ -144,7 +144,7 @@ export const validateAuthentication = celebrate({
 export const validateGetOrders = celebrate({
     query: Joi.object().keys({
         page: Joi.number().integer().min(1).default(1),
-        limit: Joi.number().integer().min(1).max(10).default(10),
+        limit: Joi.number().integer().min(1).default(10),
         sortField: Joi.string().default('createdAt'),
         sortOrder: Joi.string().default('desc'),
         status: Joi.string().valid(...Object.values(StatusType)),
