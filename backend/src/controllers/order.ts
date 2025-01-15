@@ -29,6 +29,8 @@ export const getOrders = async (
             search,
         } = req.query
 
+        const normalizedLimit = Math.min(Number(limit), 10);
+
         const filters: FilterQuery<Partial<IOrder>> = {}
 
         if (status) {
@@ -134,7 +136,7 @@ export const getOrders = async (
 
         const orders = await Order.aggregate(aggregatePipeline)
         const totalOrders = await Order.countDocuments(filters)
-        const totalPages = Math.ceil(totalOrders / Number(limit))
+        const totalPages = Math.ceil(totalOrders / normalizedLimit)
 
         res.status(200).json({
             orders,
