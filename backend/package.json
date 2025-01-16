@@ -54,6 +54,7 @@
     "sanitize-html": "^2.14.0",
     "sharp": "^0.33.4",
     "unique-slug": "^4.0.0",
+    "uuid": "^11.0.5",
     "validator": "^13.12.0"
   }
 }
