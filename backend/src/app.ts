@@ -21,7 +21,7 @@ app.use(cors({ origin: ORIGIN_ALLOW, credentials: true }))
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 40,
+    max: 400,
     message: 'Too many requests from this IP, please try again later.',
 })
 app.use(limiter)

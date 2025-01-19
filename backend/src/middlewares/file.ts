@@ -2,9 +2,16 @@ import { Request, Express } from 'express'
 import multer, { FileFilterCallback } from 'multer'
 import path, { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
+import fs from 'fs'
 
 type DestinationCallback = (error: Error | null, destination: string) => void
 type FileNameCallback = (error: Error | null, filename: string) => void
+
+const ensureDirectoryExists = (directory: string) => {
+    if (!fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true })
+    }
+}
 
 const storage = multer.diskStorage({
     destination: (
@@ -12,15 +19,12 @@ const storage = multer.diskStorage({
         _file: Express.Multer.File,
         cb: DestinationCallback
     ) => {
-        cb(
-            null,
-            join(
-                __dirname,
-                process.env.UPLOAD_PATH_TEMP
-                    ? `../public/${process.env.UPLOAD_PATH_TEMP}`
-                    : '../public'
-            )
-        )
+        const uploadPath = process.env.UPLOAD_PATH_TEMP
+            ? `../public/${process.env.UPLOAD_PATH_TEMP}`
+            : '../public'
+        const fullPath = join(__dirname, uploadPath)
+        ensureDirectoryExists(fullPath)
+        cb(null, fullPath)
     },
 
     filename: (
@@ -28,7 +32,7 @@ const storage = multer.diskStorage({
         file: Express.Multer.File,
         cb: FileNameCallback
     ) => {
-        cb(null, uuidv4() + path.extname(file.originalname))
+        cb(null, uuidv4() + path.extname(file.originalname));
     },
 })
 
