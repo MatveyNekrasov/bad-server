@@ -46,14 +46,14 @@ const fileFilter = (
     cb: FileFilterCallback
 ) => {
     if (!types.includes(file.mimetype)) {
-        return cb(new Error('Invalid file type'));
+        return cb(new Error('Invalid file type'))
     }
 
     if (file.size < 2 * 1024) {
-        return cb(new Error('File size is too small'));
+        return cb(new Error('File size is too small'))
     }
 
-    return cb(null, true);
+    return cb(null, true)
 }
 
 const limits = {

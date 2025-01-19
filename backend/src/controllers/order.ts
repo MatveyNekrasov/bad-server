@@ -29,7 +29,7 @@ export const getOrders = async (
             search,
         } = req.query
 
-        const normalizedLimit = Math.min(Number(limit), 10);
+        const normalizedLimit = Math.min(Number(limit), 10)
 
         const filters: FilterQuery<Partial<IOrder>> = {}
 
@@ -315,7 +315,7 @@ export const createOrder = async (
         }
 
         const sanitizedComment = sanitizeHtml(comment, {
-            allowedTags: ['b', 'i', 'em', 'strong']
+            allowedTags: ['b', 'i', 'em', 'strong'],
         })
 
         const newOrder = new Order({

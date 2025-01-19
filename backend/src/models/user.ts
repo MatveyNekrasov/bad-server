@@ -1,7 +1,13 @@
 /* eslint-disable no-param-reassign */
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
-import mongoose, { Document, HydratedDocument, Model, Schema, Types } from 'mongoose'
+import mongoose, {
+    Document,
+    HydratedDocument,
+    Model,
+    Schema,
+    Types,
+} from 'mongoose'
 import validator from 'validator'
 import md5 from 'md5'
 

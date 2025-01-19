@@ -29,7 +29,7 @@ export const getCustomers = async (
             search,
         } = req.query
 
-        const normalizedLimit = Math.min(Number(limit), 10);
+        const normalizedLimit = Math.min(Number(limit), 10)
 
         const filters: FilterQuery<Partial<IUser>> = {}
 
