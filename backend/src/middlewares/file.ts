@@ -1,11 +1,14 @@
-import { Request, Express } from 'express'
+import { Request, Express, NextFunction, Response } from 'express'
 import multer, { FileFilterCallback } from 'multer'
 import path, { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
+import BadRequestError from '../errors/bad-request-error'
 
 type DestinationCallback = (error: Error | null, destination: string) => void
 type FileNameCallback = (error: Error | null, filename: string) => void
+
+const MIN_FILE_SIZE = 2 * 1024; // 2 KB
 
 const ensureDirectoryExists = (directory: string) => {
     if (!fs.existsSync(directory)) {
@@ -53,15 +56,18 @@ const fileFilter = (
         return cb(new Error('Invalid file type'))
     }
 
-    if (file.size < 2 * 1024) {
-        return cb(new Error('File size is too small'))
-    }
-
     return cb(null, true)
 }
+
+export const checkMinFileSize = (req: Request, _res: Response, next: NextFunction) => {
+    if (req.headers['content-length'] && parseInt(req.headers['content-length'], 10) < MIN_FILE_SIZE) {
+        return next(new BadRequestError('File size is too small'));
+    }
+    next();
+};
 
 const limits = {
     fileSize: 10 * 1024 * 1024,
 }
 
-export default multer({ storage, fileFilter, limits })
+export const upload = multer({ storage, fileFilter, limits })
