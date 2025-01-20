@@ -85,9 +85,18 @@ export const checkImageContent = async (
     next: NextFunction
 ) => {
     if (req.file) {
+        const filePath = path.join(
+            __dirname,
+            '../public/temp',
+            req.file.filename
+        )
         try {
-            await sharp(req.file.buffer).metadata()
-        } catch (err) {
+            const buffer = fs.readFileSync(filePath)
+            const metadata = await sharp(buffer).metadata()
+            if (!metadata.width || !metadata.height) {
+                return next(new BadRequestError('Invalid image content'))
+            }
+        } catch (error) {
             return next(new BadRequestError('Invalid image content'))
         }
     }
