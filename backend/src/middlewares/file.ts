@@ -3,12 +3,14 @@ import multer, { FileFilterCallback } from 'multer'
 import path, { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
+import sharp from 'sharp'
 import BadRequestError from '../errors/bad-request-error'
 
 type DestinationCallback = (error: Error | null, destination: string) => void
 type FileNameCallback = (error: Error | null, filename: string) => void
 
-const MIN_FILE_SIZE = 2 * 1024; // 2 KB
+const MIN_FILE_SIZE = 2 * 1024 // 2 KB
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 
 const ensureDirectoryExists = (directory: string) => {
     if (!fs.existsSync(directory)) {
@@ -35,7 +37,7 @@ const storage = multer.diskStorage({
         file: Express.Multer.File,
         cb: FileNameCallback
     ) => {
-        cb(null, uuidv4() + path.extname(file.originalname));
+        cb(null, uuidv4() + path.extname(file.originalname))
     },
 })
 
@@ -59,15 +61,37 @@ const fileFilter = (
     return cb(null, true)
 }
 
-export const checkMinFileSize = (req: Request, _res: Response, next: NextFunction) => {
-    if (req.headers['content-length'] && parseInt(req.headers['content-length'], 10) < MIN_FILE_SIZE) {
-        return next(new BadRequestError('File size is too small'));
-    }
-    next();
-};
-
 const limits = {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: MAX_FILE_SIZE,
+}
+
+export const checkMinFileSize = (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) => {
+    if (
+        req.headers['content-length'] &&
+        parseInt(req.headers['content-length'], 10) < MIN_FILE_SIZE
+    ) {
+        return next(new BadRequestError('File size is too small'))
+    }
+    next()
+}
+
+export const checkImageContent = async (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+) => {
+    if (req.file) {
+        try {
+            await sharp(req.file.buffer).metadata()
+        } catch (err) {
+            return next(new BadRequestError('Invalid image content'))
+        }
+    }
+    next()
 }
 
 export const upload = multer({ storage, fileFilter, limits })
